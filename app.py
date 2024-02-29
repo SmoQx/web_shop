@@ -1,7 +1,9 @@
 from flask import Flask, render_template, request, redirect, url_for, send_file, after_this_request
-
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://app:app@localhost/app'
+db = SQLAlchemy(app)
 
 
 @app.route('/')
