@@ -9,14 +9,19 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://app:app@localhost/app'
 db = SQLAlchemy(app)
 #user_db = users(db.Model)
-class TeamData(db.Model):
+class user_db(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    team1 = db.Column(db.String(200))
-    team2 = db.Column(db.String(200))
+    name = db.Column(db.String(200))
+    surename = db.Column(db.String(200))
+
+with app.app_context():
+    db.create_all()
+
 
 @app.route('/adduser/<name>')
 def add_user(name):
-    db.session.add(user_db(name=name, surename=name))
+    new_user = user_db(name=name, surename=name)
+    db.session.add(new_user)
     db.session.commit()
     return f"added {name}"
 
