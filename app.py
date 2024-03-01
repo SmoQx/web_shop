@@ -1,9 +1,23 @@
 from flask import Flask, render_template, request, redirect, url_for, send_file, after_this_request
 from flask_sqlalchemy import SQLAlchemy
+#from app_db import db, users
+
 
 app = Flask(__name__)
+
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://app:app@localhost/app'
 db = SQLAlchemy(app)
+#user_db = users(db.Model)
+class TeamData(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    team1 = db.Column(db.String(200))
+    team2 = db.Column(db.String(200))
+
+@app.route('/adduser/<name>')
+def add_user(name):
+    db.session.add(user_db(name=name, surename=name))
+    db.session.commit()
+    return f"added {name}"
 
 
 @app.route('/')
