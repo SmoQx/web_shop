@@ -6,16 +6,16 @@ from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://app:app@localhost/app'
-db = SQLAlchemy(app)
-#user_db = users(db.Model)
-class user_db(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(200))
-    surename = db.Column(db.String(200))
-
-with app.app_context():
-    db.create_all()
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://app:app@localhost/app'
+#db = SQLAlchemy(app)
+##user_db = users(db.Model)
+#class user_db(db.Model):
+#    id = db.Column(db.Integer, primary_key=True)
+#    name = db.Column(db.String(200))
+#    surename = db.Column(db.String(200))
+#
+#with app.app_context():
+#    db.create_all()
 
 
 @app.route('/adduser/<name>')

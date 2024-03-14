@@ -162,3 +162,5 @@ cython_debug/
 # nohup
 nohup.out
 out.log
+
+shop
