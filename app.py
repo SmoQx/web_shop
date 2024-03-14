@@ -58,5 +58,11 @@ def user_page(user_id):
     return render_template('user.html')
 
 
+@app.route('/yes')
+def yes():
+    print("yessss")
+    return render_template('user.html')
+
+
 if __name__ == '__main__':
     app.run(debug=True, host='::', port=80)
