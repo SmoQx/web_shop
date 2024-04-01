@@ -1,26 +1,33 @@
 from flask import Flask, render_template, request, redirect, url_for, send_file, after_this_request
 from flask_sqlalchemy import SQLAlchemy
-#from app_db import db, users
-
+import apps_db
+import uuid
+from gen_password import gen_password_hash
+from gen_username_hash import gen_username_hash
 
 
 app = Flask(__name__)
 
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://app:app@localhost/app'
-#db = SQLAlchemy(app)
-##user_db = users(db.Model)
-#class user_db(db.Model):
-#    id = db.Column(db.Integer, primary_key=True)
-#    name = db.Column(db.String(200))
-#    surename = db.Column(db.String(200))
-#
-#with app.app_context():
-#    db.create_all()
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:12345678@127.0.0.1:40266/app'
+db = SQLAlchemy(app=app)
+
+
+def rand_id() -> int:
+    value = int(str(uuid.uuid4()).replace("-", ""), 16)
+    value = value / 1000000000000000000000000
+    return int(value)
 
 
 @app.route('/adduser/<name>')
 def add_user(name):
-    new_user = user_db(name=name, surename=name)
+    
+    new_user = apps_db.User(
+            user_id = uuid.uuid4(),
+            email = f"{name}@mail.com",
+            password = gen_password_hash(name),
+            username = gen_username_hash(name),
+            name = name
+            )
     db.session.add(new_user)
     db.session.commit()
     return f"added {name}"
