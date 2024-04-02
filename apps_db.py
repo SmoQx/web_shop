@@ -1,5 +1,5 @@
 from app import db
-
+import sqlalchemy.dialects.postgresql as sapgsql
 
 
 class Order(db.Model):
@@ -14,7 +14,7 @@ class Order(db.Model):
     payment_method = db.Column(db.String)
     status = db.Column(db.String)
     delivery_addres = db.Column(db.String)
-#    total_price = db.Column(db.MONEY)
+    total_price = db.Column(sapgsql.MONEY)
 
     produkty = db.relationship('Produkty', primaryjoin='Order.produkt_name == Produkty.produkt_name', backref='produkty_orders')
     produkty1 = db.relationship('Produkty', primaryjoin='Order.produkty_id == Produkty.produkty_id', backref='produkty_orders_0')
@@ -27,7 +27,7 @@ class Produkty(db.Model):
 
     produkty_id = db.Column(db.Integer, primary_key=True)
     produkt_name = db.Column(db.String, unique=True)
-#    value = db.Column(db.MONEY, nullable=False)
+    value = db.Column(sapgsql.MONEY, nullable=False)
     amount = db.Column(db.Integer)
     description = db.Column(db.Text)
     typ = db.Column(db.String)
