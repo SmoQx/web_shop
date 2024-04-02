@@ -8,7 +8,7 @@ from gen_username_hash import gen_username_hash
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:12345678@127.0.0.1:40266/app'
+app.config['SQLALCHEMY_DATABASE_URI'] = ''
 db = SQLAlchemy(app=app)
 
 
