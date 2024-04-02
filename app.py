@@ -12,12 +12,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:12345678@127.0.0.
 db = SQLAlchemy(app=app)
 
 
-def rand_id() -> int:
-    value = int(str(uuid.uuid4()).replace("-", ""), 16)
-    value = value / 1000000000000000000000000
-    return int(value)
-
-
 @app.route('/adduser/<name>')
 def add_user(name):
     
@@ -32,6 +26,20 @@ def add_user(name):
     db.session.commit()
     return f"added {name}"
 
+
+@app.route('/additem/<item>')
+def add_item(item: str) -> str:
+    new_item = apps_db.Produkty(produkty_id = 5,
+                                produkt_name = item,
+                                value = "10,00",
+                                amount = "0",
+                                typ = "figurine"
+                                )
+
+    db.session.add(new_item)
+    db.session.commit()
+
+    return f"added {item}"
 
 @app.route('/')
 def main():
