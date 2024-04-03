@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, redirect, url_for, send_file, after_this_request
+from flask import Flask, render_template, request, redirect, url_for, send_file, after_this_request, jsonify , Response
+from werkzeug.wrappers import response
 from flask_sqlalchemy import SQLAlchemy
 import apps_db
 import uuid
@@ -16,12 +17,12 @@ db = SQLAlchemy(app=app)
 def add_user(name):
     
     new_user = apps_db.User(
-            user_id = uuid.uuid4(),
-            email = f"{name}@mail.com",
-            password = gen_password_hash(name),
-            username = gen_username_hash(name),
-            name = name
-            )
+                            user_id = uuid.uuid4(),
+                            email = f"{name}@mail.com",
+                            password = gen_password_hash(name),
+                            username = gen_username_hash(name),
+                            name = name
+                            )
     db.session.add(new_user)
     db.session.commit()
     return f"added {name}"
@@ -40,6 +41,20 @@ def add_item(item: str) -> str:
     db.session.commit()
 
     return f"added {item}"
+
+
+@app.route('/json', methods = ['POST'])
+def data_parser():
+    content = request.get_json()
+    content = dict(content)
+    for key, value in content.items():
+        print(f"key = {key}: value = {value}")
+    repsonse_data = {
+        "status": "success",
+        "data": content
+            }
+    return jsonify(repsonse_data), 200
+    
 
 @app.route('/')
 def main():
