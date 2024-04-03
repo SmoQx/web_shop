@@ -5,7 +5,7 @@ from sqlalchemy import ForeignKeyConstraint
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = ''
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://app:app@maluch2.mikr.us:40266/app'
 db = SQLAlchemy(app=app)
 #user_db = users(db.Model)
 class Product(db.Model):

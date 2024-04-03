@@ -1,30 +1,63 @@
-from flask import Flask, render_template, request, redirect, url_for, send_file, after_this_request
+from flask import Flask, render_template, request, redirect, url_for, send_file, after_this_request, jsonify , Response
+from werkzeug.wrappers import response
 from flask_sqlalchemy import SQLAlchemy
-#from app_db import db, users
-
+import apps_db
+import uuid
+from gen_password import gen_password_hash
+from gen_username_hash import gen_username_hash
 
 
 app = Flask(__name__)
 
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://app:app@localhost/app'
-#db = SQLAlchemy(app)
-##user_db = users(db.Model)
-#class user_db(db.Model):
-#    id = db.Column(db.Integer, primary_key=True)
-#    name = db.Column(db.String(200))
-#    surename = db.Column(db.String(200))
-#
-#with app.app_context():
-#    db.create_all()
+with open("login.json", 'r') as read_login:
+    read_data = read_login.read()
+
+app.config['SQLALCHEMY_DATABASE_URI'] = ''
+db = SQLAlchemy(app=app)
 
 
 @app.route('/adduser/<name>')
 def add_user(name):
-    new_user = user_db(name=name, surename=name)
+    
+    new_user = apps_db.User(
+                            user_id = uuid.uuid4(),
+                            email = f"{name}@mail.com",
+                            password = gen_password_hash(name),
+                            username = gen_username_hash(name),
+                            name = name
+                            )
     db.session.add(new_user)
     db.session.commit()
     return f"added {name}"
 
+
+@app.route('/additem/<item>')
+def add_item(item: str) -> str:
+    new_item = apps_db.Produkty(produkty_id = 5,
+                                produkt_name = item,
+                                value = "10,00",
+                                amount = "0",
+                                typ = "figurine"
+                                )
+
+    db.session.add(new_item)
+    db.session.commit()
+
+    return f"added {item}"
+
+
+@app.route('/json', methods = ['POST'])
+def data_parser():
+    content = request.get_json()
+    content = dict(content)
+    for key, value in content.items():
+        print(f"key = {key}: value = {value}")
+    repsonse_data = {
+        "status": "success",
+        "data": content
+            }
+    return jsonify(repsonse_data), 200
+    
 
 @app.route('/')
 def main():
@@ -55,6 +88,12 @@ def display_item(item_id):
 def user_page(user_id):
     print("USER ID IS", user_id)
     # TODO: User page
+    return render_template('user.html')
+
+
+@app.route('/yes')
+def yes():
+    print("yessss")
     return render_template('user.html')
 
 
