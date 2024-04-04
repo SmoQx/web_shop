@@ -1,4 +1,4 @@
-from flask import Flask, Request, render_template, request, redirect, url_for, send_file, after_this_request, jsonify , Response
+from flask import Flask, Request, render_template, request, redirect, url_for, send_file, after_this_request, jsonify 
 from werkzeug.wrappers import response
 from flask_sqlalchemy import SQLAlchemy
 import json
@@ -20,22 +20,23 @@ db = SQLAlchemy(app=app)
 
 @app.route('/adduser', methods = ['POST'])
 def add_user():
-    data = request.get_json()
-    if request.is_json:
-        if "name" in data:
-            name = data["name"]
-            new_user = apps_db.User(
-                                    user_id = uuid.uuid4(),
-                                    email = f"{name}@mail.com",
-                                    password = gen_password_hash(name),
-                                    username = gen_username_hash(name),
-                                    name = name
-                                    )
-            db.session.add(new_user)
-            db.session.commit()
-            return f"added {name}"
-        else:
-            return "No Name"
+    try:
+        request.get_json()
+    except Exception as e:
+        return e
+    data = request.json
+    if "name" in data:
+        name = data["name"]
+        new_user = apps_db.User(
+                                user_id = uuid.uuid4(),
+                                email = f"{data['email']}",
+                                password = gen_password_hash(data['password']),
+                                username = gen_username_hash(data['username']),
+                                name = data['name']
+                                )
+        db.session.add(new_user)
+        db.session.commit()
+        return f"added {name}"
     else:
         return f"Failed to parse json"
 
