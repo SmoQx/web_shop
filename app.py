@@ -75,6 +75,10 @@ def data_parser():
     return jsonify(repsonse_data), 200
     
 
+def search():
+    pass
+
+
 @app.route('/')
 def main():
     # TODO: REDNER ALL ITEMS LIST
