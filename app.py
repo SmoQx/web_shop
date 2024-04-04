@@ -18,8 +18,14 @@ app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{read_data["user"]}:{read
 db = SQLAlchemy(app=app)
 
 
+# TODO: create user reader 
+# TODO: create a item adder 
+# TODO: add field with image to a db 
+# TODO: create function to return items based on category
+
 @app.route('/adduser', methods = ['POST'])
 def add_user():
+    # TODO: write a checker for the data
     try:
         request.get_json()
     except Exception as e:
@@ -98,12 +104,6 @@ def display_item(item_id):
 def user_page(user_id):
     print("USER ID IS", user_id)
     # TODO: User page
-    return render_template('user.html')
-
-
-@app.route('/yes')
-def yes():
-    print("yessss")
     return render_template('user.html')
 
 
