@@ -1,6 +1,7 @@
-from flask import Flask, render_template, request, redirect, url_for, send_file, after_this_request, jsonify , Response
+from flask import Flask, Request, render_template, request, redirect, url_for, send_file, after_this_request, jsonify , Response
 from werkzeug.wrappers import response
 from flask_sqlalchemy import SQLAlchemy
+import json
 import apps_db
 import uuid
 from gen_password import gen_password_hash
@@ -10,30 +11,38 @@ from gen_username_hash import gen_username_hash
 app = Flask(__name__)
 
 with open("login.json", 'r') as read_login:
-    read_data = read_login.read()
+    read_data =json.load(read_login)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = ''
+app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{read_data["user"]}:{read_data["password"]}@{read_data["address"]}:{read_data["port"]}/{read_data["db"]}'
+
 db = SQLAlchemy(app=app)
 
 
-@app.route('/adduser/<name>')
-def add_user(name):
-    
-    new_user = apps_db.User(
-                            user_id = uuid.uuid4(),
-                            email = f"{name}@mail.com",
-                            password = gen_password_hash(name),
-                            username = gen_username_hash(name),
-                            name = name
-                            )
-    db.session.add(new_user)
-    db.session.commit()
-    return f"added {name}"
+@app.route('/adduser', methods = ['POST'])
+def add_user():
+    data = request.get_json()
+    if request.is_json:
+        if "name" in data:
+            name = data["name"]
+            new_user = apps_db.User(
+                                    user_id = uuid.uuid4(),
+                                    email = f"{name}@mail.com",
+                                    password = gen_password_hash(name),
+                                    username = gen_username_hash(name),
+                                    name = name
+                                    )
+            db.session.add(new_user)
+            db.session.commit()
+            return f"added {name}"
+        else:
+            return "No Name"
+    else:
+        return f"Failed to parse json"
 
 
 @app.route('/additem/<item>')
 def add_item(item: str) -> str:
-    new_item = apps_db.Produkty(produkty_id = 5,
+    new_item = apps_db.Produkty(produkty_id = 9,
                                 produkt_name = item,
                                 value = "10,00",
                                 amount = "0",
