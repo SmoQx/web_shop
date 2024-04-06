@@ -1,4 +1,4 @@
-from flask import Flask, Request, render_template, request, redirect, url_for, send_file, after_this_request, jsonify , Response
+from flask import Flask, Request, render_template, request, redirect, url_for, send_file, after_this_request, jsonify 
 from werkzeug.wrappers import response
 from flask_sqlalchemy import SQLAlchemy
 import json
@@ -6,6 +6,7 @@ import apps_db
 import uuid
 from gen_password import gen_password_hash
 from gen_username_hash import gen_username_hash
+import sqlalchemy.exc
 
 
 app = Flask(__name__)
@@ -18,40 +19,80 @@ app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{read_data["user"]}:{read
 db = SQLAlchemy(app=app)
 
 
+# TODO: create user reader 
+# TODO: create a item adder 
+# TODO: add field with image to a db 
+# TODO: create function to return items based on category
+
 @app.route('/adduser', methods = ['POST'])
 def add_user():
-    data = request.get_json()
-    if request.is_json:
-        if "name" in data:
-            name = data["name"]
-            new_user = apps_db.User(
-                                    user_id = uuid.uuid4(),
-                                    email = f"{name}@mail.com",
-                                    password = gen_password_hash(name),
-                                    username = gen_username_hash(name),
-                                    name = name
-                                    )
-            db.session.add(new_user)
-            db.session.commit()
-            return f"added {name}"
-        else:
-            return "No Name"
-    else:
-        return f"Failed to parse json"
+    try:
+        data = request.get_json()
 
+        username = data.get("username")
+        password = data.get("password")
+        email = data.get("email")
 
-@app.route('/additem/<item>')
-def add_item(item: str) -> str:
-    new_item = apps_db.Produkty(produkty_id = 9,
-                                produkt_name = item,
-                                value = "10,00",
-                                amount = "0",
-                                typ = "figurine"
+        if not (username and password and email):
+            return jsonify({"error": "Missing required fields"}), 400
+        hashed_password = gen_password_hash(password)
+        hashed_username = gen_username_hash(username)
+    except Exception as e:
+        print(e)
+        return jsonify({"error": "No JSON data provided"}), 400
+    data = request.json
+    try:
+        new_user = apps_db.User(
+                                user_id = uuid.uuid4(),
+                                email = email,
+                                password = hashed_password,
+                                username = hashed_username,
                                 )
+        db.session.add(new_user)
+        db.session.commit()
+    except sqlalchemy.exc.IntegrityError as already_in:
+        print(already_in)
+        return jsonify({"error": "user already exists"}), 409
+    except Exception as e:
+        print(e)
+        return jsonify({"error": "an error has ccured"}), 408
+    finally:
+        db.session.close()
+    print(f"User succesfouly added {username}")
+    return jsonify({"success": f"user added {username}"}), 201
 
-    db.session.add(new_item)
-    db.session.commit()
 
+@app.route('/additem')
+def add_item(item: str):
+    try:
+        data = request.get_json()
+        produkty_id = data.get("produkty_id")
+        produkt_name = data.get("produkt_name")
+        value = data.get("value")
+        amount = data.get("amount")
+        typ = data.get("typ")
+
+        if not (produkty_id and produkt_name and value and amount and typ):
+            return jsonify({"error": "Missing required fields"}), 400
+
+    except Exception as e:
+        print(e)
+        return jsonify({"error": "error reading json"}), 408
+    if "produkty_id" in data and "produkt_name" in data and "value" in data and "typ" in data:
+        try:
+            new_item = apps_db.Produkty(
+                                        produkty_id = produkty_id,
+                                        produkt_name = produkt_name,
+                                        value = value,
+                                        amount = amount,
+                                        typ = typ
+                                        )
+
+            db.session.add(new_item)
+            db.session.commit()
+        except Exception as e:
+            print(e)
+            return jsonify({"error": f"an exception has occured {e}"}), 408
     return f"added {item}"
 
 
@@ -67,6 +108,10 @@ def data_parser():
             }
     return jsonify(repsonse_data), 200
     
+
+def search():
+    pass
+
 
 @app.route('/')
 def main():
@@ -97,12 +142,6 @@ def display_item(item_id):
 def user_page(user_id):
     print("USER ID IS", user_id)
     # TODO: User page
-    return render_template('user.html')
-
-
-@app.route('/yes')
-def yes():
-    print("yessss")
     return render_template('user.html')
 
 

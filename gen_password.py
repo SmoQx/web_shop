@@ -2,11 +2,11 @@ import hashlib
 
 
 def gen_password_hash(user_password: str) -> str:
-    md5_hasher = hashlib.md5()
+    hasher = hashlib.sha256()
     salt = "asdf" 
     user_password = user_password + salt
-    md5_hasher.update(user_password.encode("utf-8"))
-    user_password = md5_hasher.hexdigest()
+    hasher.update(user_password.encode("utf-8"))
+    user_password = hasher.hexdigest()
 
     return str(user_password)
 

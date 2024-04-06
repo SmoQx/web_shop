@@ -1,8 +1,8 @@
-from hashlib import md5
+from hashlib import sha256
 
 
 def gen_username_hash(username: str) -> str:
-    hash = md5()
+    hash = sha256()
     hash.update(username.encode("utf-8"))
 
     return str(hash.hexdigest())
