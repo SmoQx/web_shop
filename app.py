@@ -27,9 +27,7 @@ db = SQLAlchemy(app=app)
 @app.route('/adduser', methods = ['POST'])
 def add_user():
     try:
-        request.get_json()
-        if not data:
-            return jsonify({"error": "No JSON data provided"}), 400
+        data = request.get_json()
 
         username = data.get("username")
         password = data.get("password")
@@ -37,57 +35,64 @@ def add_user():
 
         if not (username and password and email):
             return jsonify({"error": "Missing required fields"}), 400
+        hashed_password = gen_password_hash(password)
+        hashed_username = gen_username_hash(username)
     except Exception as e:
         print(e)
-        return jsonify({"error": "error reading json"}), 408
+        return jsonify({"error": "No JSON data provided"}), 400
     data = request.json
-    if "username" in data and "password" in data and "email" in data:
-        try:
-            new_user = apps_db.User(
-                                    user_id = uuid.uuid4(),
-                                    email = f"{data['email']}",
-                                    password = gen_password_hash(data['password']),
-                                    username = gen_username_hash(data['username']),
-                                    )
-            db.session.add(new_user)
-            db.session.commit()
-        except sqlalchemy.exc.IntegrityError as already_in:
-            print(already_in)
-            return jsonify({"error": "user already exists"}), 409
-        except Exception as e:
-            print(e)
-            return jsonify({"error": "an error has ccured"}), 408
-        finally:
-            db.session.close()
-        print(f"User succesfouly added {data['username']}")
-        return jsonify({"success": f"user added {data['username']}"}), 201
-    else:
-        return jsonify({"error": "failed to parse json wrong data"}), 408
+    try:
+        new_user = apps_db.User(
+                                user_id = uuid.uuid4(),
+                                email = email,
+                                password = hashed_password,
+                                username = hashed_username,
+                                )
+        db.session.add(new_user)
+        db.session.commit()
+    except sqlalchemy.exc.IntegrityError as already_in:
+        print(already_in)
+        return jsonify({"error": "user already exists"}), 409
+    except Exception as e:
+        print(e)
+        return jsonify({"error": "an error has ccured"}), 408
+    finally:
+        db.session.close()
+    print(f"User succesfouly added {username}")
+    return jsonify({"success": f"user added {username}"}), 201
 
 
 @app.route('/additem')
 def add_item(item: str):
     try:
-        request.get_json()
+        data = request.get_json()
+        produkty_id = data.get("produkty_id")
+        produkt_name = data.get("produkt_name")
+        value = data.get("value")
+        amount = data.get("amount")
+        typ = data.get("typ")
+
+        if not (produkty_id and produkt_name and value and amount and typ):
+            return jsonify({"error": "Missing required fields"}), 400
+
     except Exception as e:
         print(e)
         return jsonify({"error": "error reading json"}), 408
-    data = request.json
     if "produkty_id" in data and "produkt_name" in data and "value" in data and "typ" in data:
         try:
             new_item = apps_db.Produkty(
-                                        produkty_id = data["produkty_id"],
-                                        produkt_name = data["produkt_name"],
-                                        value = data["value"],
-                                        amount = data["amount"],
-                                        typ = data["typ"]
+                                        produkty_id = produkty_id,
+                                        produkt_name = produkt_name,
+                                        value = value,
+                                        amount = amount,
+                                        typ = typ
                                         )
 
             db.session.add(new_item)
             db.session.commit()
         except Exception as e:
             print(e)
-            return jsonify({"error": f"an exception hs occured {e}"}), 408
+            return jsonify({"error": f"an exception has occured {e}"}), 408
     return f"added {item}"
 
 
