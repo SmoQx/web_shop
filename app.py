@@ -93,7 +93,22 @@ def add_item(item: str):
         except Exception as e:
             print(e)
             return jsonify({"error": f"an exception has occured {e}"}), 408
+        finally:
+            db.session.close()
     return f"added {item}"
+
+
+@app.route('/find_item/<item_id>', methods = ['GET', 'POST'])
+def find_item(item_id):
+    item_id = item_id
+    item_table = apps_db.Produkty
+    try:
+        query_for_item = db.session.query(item_table).filter_by(produkty_id = item_id).one()
+        return jsonify({"success": f"retured {query_for_item.produkty_id, query_for_item.value, query_for_item.produkt_name}"}), 201
+    except Exception as e:
+        return jsonify({"error": f"Error processing querry \n {e}"}), 408
+    finally:
+        db.session.close()
 
 
 @app.route('/json', methods = ['POST'])
