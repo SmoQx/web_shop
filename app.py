@@ -111,6 +111,21 @@ def find_item(item_id):
         db.session.close()
 
 
+@app.route('/login/<username>,<password>')
+def login(username: str, password: str):
+    user_table = apps_db.User
+    try:
+        querry_user = db.session.query(user_table).filter_by(username = gen_username_hash(username)).one()
+        if querry_user.username == gen_username_hash(username) and querry_user.password == gen_password_hash(password):
+            return jsonify({"succes": "User authenticated"}), 201
+        else:
+            return jsonify({"fail": "User not authentiucated"}), 203
+    except Exception as e:
+        return jsonify({"error": f"{e}"}), 408
+    finally:
+        db.session.close()
+
+
 @app.route('/json', methods = ['POST'])
 def data_parser():
     content = request.get_json()
