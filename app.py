@@ -98,9 +98,17 @@ def add_item(item: str):
     return f"added {item}"
 
 
-@app.route('/find_item/<item_id>', methods = ['GET', 'POST'])
-def find_item(item_id):
-    item_id = item_id
+@app.route('/find_item', methods = ['GET', 'POST'])
+def find_item():
+    try:
+        data = request.get_json()
+        item_id = data.get("item_id")
+        if not (item_id):
+            return jsonify({"error": "No item id"}), 404
+    except Exception as e:
+        print(e)
+        return jsonify({"error": f"{e}"}), 400
+
     item_table = apps_db.Produkty
     try:
         query_for_item = db.session.query(item_table).filter_by(produkty_id = item_id).one()
@@ -111,8 +119,22 @@ def find_item(item_id):
         db.session.close()
 
 
-@app.route('/login/<username>,<password>')
-def login(username: str, password: str):
+@app.route('/login', methods = ['POST'])
+def login():
+    try:
+        data = request.get_json()
+
+        username = data.get("username")
+        password = data.get("password")
+        email = data.get("email")
+
+        if not (username and password and email):
+            return jsonify({"error": "Missing required fields"}), 400
+    except Exception as e:
+        print(e)
+        return jsonify({"error": "No JSON data provided"}), 400
+    data = request.json
+
     user_table = apps_db.User
     try:
         querry_user = db.session.query(user_table).filter_by(username = gen_username_hash(username)).one()
