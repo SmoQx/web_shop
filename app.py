@@ -19,8 +19,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{read_data["user"]}:{read
 db = SQLAlchemy(app=app)
 
 
-# TODO: create user reader 
-# TODO: create a item adder 
 # TODO: add field with image to a db 
 # TODO: create function to return items based on category
 
@@ -42,12 +40,12 @@ def add_user():
         return jsonify({"error": "No JSON data provided"}), 400
     data = request.json
     try:
-        new_user = apps_db.User(
-                                user_id = uuid.uuid4(),
-                                email = email,
-                                password = hashed_password,
-                                username = hashed_username,
-                                )
+        new_user = apps_db.User()
+        new_user.user_id = uuid.uuid4()
+        new_user.email = email
+        new_user.password = hashed_password
+        new_user.username = hashed_username
+                                
         db.session.add(new_user)
         db.session.commit()
     except sqlalchemy.exc.IntegrityError as already_in:
@@ -62,8 +60,9 @@ def add_user():
     return jsonify({"success": f"user added {username}"}), 201
 
 
-@app.route('/additem')
-def add_item(item: str):
+@app.route('/add_item', methods = ['POST'])
+def add_item():
+    # TODO: check if the integer isnt to high
     try:
         data = request.get_json()
         produkty_id = data.get("produkty_id")
@@ -78,27 +77,23 @@ def add_item(item: str):
     except Exception as e:
         print(e)
         return jsonify({"error": "error reading json"}), 408
-    if "produkty_id" in data and "produkt_name" in data and "value" in data and "typ" in data:
-        try:
-            new_item = apps_db.Produkty(
-                                        produkty_id = produkty_id,
-                                        produkt_name = produkt_name,
-                                        value = value,
-                                        amount = amount,
-                                        typ = typ
-                                        )
+    try:
+        new_item = apps_db.Produkty()
+        new_item.produkty_id = produkty_id
+        new_item.produkt_name = produkt_name
+        new_item.value = value
+        new_item.amount = amount
+        new_item.typ = typ
 
-            db.session.add(new_item)
-            db.session.commit()
-        except Exception as e:
-            print(e)
-            return jsonify({"error": f"an exception has occured {e}"}), 408
-        finally:
-            db.session.close()
-    return f"added {item}"
+        db.session.add(new_item)
+        db.session.commit()
+    except Exception as e:
+        print(e)
+        return jsonify({"error": f"an exception has occured {e}"}), 408
+    return jsonify({"success": f"added {new_item.produkt_name}"})
 
 
-@app.route('/find_item', methods = ['GET', 'POST'])
+@app.route('/find_item', methods = ['GET'])
 def find_item():
     try:
         data = request.get_json()
@@ -119,8 +114,8 @@ def find_item():
         db.session.close()
 
 
-@app.route('/login', methods = ['POST'])
-def login():
+@app.route('/authenticate', methods = ['POST'])
+def authenticate():
     try:
         data = request.get_json()
 
@@ -146,6 +141,12 @@ def login():
         return jsonify({"error": f"{e}"}), 408
     finally:
         db.session.close()
+
+
+@app.route('/change_item', methods = ['PUT'])
+def change_item():
+    return jsonify({"success": "item updated"}), 201
+
 
 
 @app.route('/json', methods = ['POST'])
