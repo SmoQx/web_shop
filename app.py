@@ -155,12 +155,13 @@ def authenticate():
 def change_item():
     try:
         data = request.get_json()
-        print(request.get_data())
-        id_to_change = data.get("id_to_change")
-        change_id_to = data.get("change_id_to")
-        if not(id_to_change and change_id_to):
-            print("Error missing fields")
-            return jsonify({"Error": "Missing fileds which are requierd to update item"}), 407
+        item_id = data.get("item_id")
+        what_to_change = data.get("what_to_change")
+        if type(what_to_change) == list:
+            for _ in what_to_change:
+                print(_)
+        keys = request.data
+        print(keys)
     except Exception as e:
         print(e)
         return jsonify({"Error": f"Error while processing data {e}"}), 408
@@ -169,8 +170,7 @@ def change_item():
     item_table = apps_db.Produkty
     
     try:
-        querry_to_update_item = db.session.query(item_table).filter_by(produkty_id = id_to_change).one()
-        querry_to_update_item.produkty_id = change_id_to
+        querry_to_update_item = db.session.query(item_table).filter_by(produkty_id = item_id).one()
         db.session.commit()
     except Exception as e:
         print(e)
@@ -178,7 +178,7 @@ def change_item():
     finally:
         db.session.close()
 
-    return jsonify({"success": "item updated"}), 201
+    return jsonify({"success": "The data was correct"}), 201
 
 
 
