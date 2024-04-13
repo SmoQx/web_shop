@@ -1,3 +1,4 @@
+import re
 from flask import Flask, Request, render_template, request, redirect, url_for, send_file, after_this_request, jsonify 
 from werkzeug.wrappers import response
 from flask_sqlalchemy import SQLAlchemy
@@ -26,26 +27,26 @@ db = SQLAlchemy(app=app)
 def add_user():
     try:
         data = request.get_json()
-
         username = data.get("username")
         password = data.get("password")
         email = data.get("email")
-
         if not (username and password and email):
+            print("Missing requierd fields in user")
             return jsonify({"error": "Missing required fields"}), 400
         hashed_password = gen_password_hash(password)
         hashed_username = gen_username_hash(username)
     except Exception as e:
         print(e)
         return jsonify({"error": "No JSON data provided"}), 400
+
     data = request.json
+
     try:
         new_user = apps_db.User()
         new_user.user_id = uuid.uuid4()
         new_user.email = email
         new_user.password = hashed_password
         new_user.username = hashed_username
-                                
         db.session.add(new_user)
         db.session.commit()
     except sqlalchemy.exc.IntegrityError as already_in:
@@ -56,6 +57,7 @@ def add_user():
         return jsonify({"error": "an error has ccured"}), 408
     finally:
         db.session.close()
+
     print(f"User succesfouly added {username}")
     return jsonify({"success": f"user added {username}"}), 201
 
@@ -70,13 +72,13 @@ def add_item():
         value = data.get("value")
         amount = data.get("amount")
         typ = data.get("typ")
-
         if not (produkty_id and produkt_name and value and amount and typ):
+            print("Missing requierd filds in item")
             return jsonify({"error": "Missing required fields"}), 400
-
     except Exception as e:
         print(e)
         return jsonify({"error": "error reading json"}), 408
+
     try:
         new_item = apps_db.Produkty()
         new_item.produkty_id = produkty_id
@@ -84,31 +86,35 @@ def add_item():
         new_item.value = value
         new_item.amount = amount
         new_item.typ = typ
-
         db.session.add(new_item)
         db.session.commit()
     except Exception as e:
         print(e)
         return jsonify({"error": f"an exception has occured {e}"}), 408
+    print(f"Added item correctly {new_item.produkt_name} with id {new_item.produkty_id}")
     return jsonify({"success": f"added {new_item.produkt_name}"})
 
 
-@app.route('/find_item', methods = ['GET'])
+@app.route('/find_item', methods = ['GET', 'POST'])
 def find_item():
     try:
         data = request.get_json()
         item_id = data.get("item_id")
         if not (item_id):
+            print("No item id")
             return jsonify({"error": "No item id"}), 404
     except Exception as e:
         print(e)
         return jsonify({"error": f"{e}"}), 400
 
     item_table = apps_db.Produkty
+
     try:
         query_for_item = db.session.query(item_table).filter_by(produkty_id = item_id).one()
+        print(f"Success found item {query_for_item.produkt_name} with id {query_for_item.produkty_id}")
         return jsonify({"success": f"retured {query_for_item.produkty_id, query_for_item.value, query_for_item.produkt_name}"}), 201
     except Exception as e:
+        print(f"Error processing querry {e}")
         return jsonify({"error": f"Error processing querry \n {e}"}), 408
     finally:
         db.session.close()
@@ -118,26 +124,28 @@ def find_item():
 def authenticate():
     try:
         data = request.get_json()
-
         username = data.get("username")
         password = data.get("password")
         email = data.get("email")
-
         if not (username and password and email):
+            print("Error no missing fields")
             return jsonify({"error": "Missing required fields"}), 400
     except Exception as e:
         print(e)
         return jsonify({"error": "No JSON data provided"}), 400
-    data = request.json
 
+    data = request.json
     user_table = apps_db.User
+
     try:
         querry_user = db.session.query(user_table).filter_by(username = gen_username_hash(username)).one()
         if querry_user.username == gen_username_hash(username) and querry_user.password == gen_password_hash(password):
+            print("User authenticated")
             return jsonify({"succes": "User authenticated"}), 201
         else:
             return jsonify({"fail": "User not authentiucated"}), 203
     except Exception as e:
+        print(f"Error has occured {e}")
         return jsonify({"error": f"{e}"}), 408
     finally:
         db.session.close()
@@ -145,6 +153,15 @@ def authenticate():
 
 @app.route('/change_item', methods = ['PUT'])
 def change_item():
+    try:
+        data = request.get_json()
+        print(request.get_data())
+        id_to_change = data.get("id_to_change")
+        change_id_to = data.get("change_id_to")
+    except Exception as e:
+        print(e)
+    finally:
+        db.session.close()
     return jsonify({"success": "item updated"}), 201
 
 
@@ -180,3 +197,4 @@ def about():
 
 if __name__ == '__main__':
     app.run(debug=True, host='::', port=80)
+
