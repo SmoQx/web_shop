@@ -153,6 +153,7 @@ def authenticate():
 
 @app.route('/change_item', methods = ['PUT', 'POST'])
 def change_item():
+    # TODO: add a way to change provided items
     try:
         data = request.get_json()
         item_id = data.get("item_id")
@@ -171,7 +172,6 @@ def change_item():
     
     try:
         querry_to_update_item = db.session.query(item_table).filter_by(produkty_id = item_id).one()
-        db.session.commit()
     except Exception as e:
         print(e)
         return jsonify({"Error": f"Error while searching \n{e}"}), 408
