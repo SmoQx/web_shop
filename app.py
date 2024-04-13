@@ -151,17 +151,33 @@ def authenticate():
         db.session.close()
 
 
-@app.route('/change_item', methods = ['PUT'])
+@app.route('/change_item', methods = ['PUT', 'POST'])
 def change_item():
     try:
         data = request.get_json()
         print(request.get_data())
         id_to_change = data.get("id_to_change")
         change_id_to = data.get("change_id_to")
+        if not(id_to_change and change_id_to):
+            print("Error missing fields")
+            return jsonify({"Error": "Missing fileds which are requierd to update item"}), 407
     except Exception as e:
         print(e)
+        return jsonify({"Error": f"Error while processing data {e}"}), 408
+
+    data = request.json
+    item_table = apps_db.Produkty
+    
+    try:
+        querry_to_update_item = db.session.query(item_table).filter_by(produkty_id = id_to_change).one()
+        querry_to_update_item.produkty_id = change_id_to
+        db.session.commit()
+    except Exception as e:
+        print(e)
+        return jsonify({"Error": f"Error while searching \n{e}"}), 408
     finally:
         db.session.close()
+
     return jsonify({"success": "item updated"}), 201
 
 
