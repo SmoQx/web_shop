@@ -19,7 +19,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{read_data["user"]}:{read
 
 db = SQLAlchemy(app=app)
 
-
+# TODO: create a db table which will contain users cart and session.
 # TODO: add field with image to a db 
 # TODO: create function to return items based on category
 
