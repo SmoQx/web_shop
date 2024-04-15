@@ -1,4 +1,3 @@
-import re
 from flask import Flask, Request, render_template, request, redirect, url_for, send_file, after_this_request, jsonify 
 from werkzeug.wrappers import response
 from flask_sqlalchemy import SQLAlchemy
@@ -19,7 +18,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{read_data["user"]}:{read
 
 db = SQLAlchemy(app=app)
 
-# TODO: create a db table which will contain users cart and session.
+# TODO: create a db table which will contain users cart and somthing to keep track of a user cart
 # TODO: add field with image to a db 
 # TODO: create function to return items based on category
 
@@ -157,25 +156,23 @@ def authenticate():
 
 @app.route('/change_item', methods = ['PUT', 'POST'])
 def change_item():
-    # TODO: add a way to change provided items
+    # TODO: if key is equal to a column name than change it
     try:
         data = request.get_json()
         item_id = data.get("item_id")
         what_to_change = data.get("what_to_change")
-        if type(what_to_change) == list:
-            for _ in what_to_change:
-                print(_)
-        keys = request.data
-        print(keys)
+        if not type(what_to_change) == dict:
+            return jsonify({"Error": "The data of what to change needs to be dictioary"}), 408
     except Exception as e:
         print(e)
         return jsonify({"Error": f"Error while processing data {e}"}), 408
 
     data = request.json
-    item_table = apps_db.Produkty
     
     try:
-        querry_to_update_item = db.session.query(item_table).filter_by(produkty_id = item_id).one()
+        print(what_to_change.items())
+        querry_produkty = db.session.get(apps_db.Produkty, item_id)
+        print(querry_produkty.produkty_id)
     except Exception as e:
         print(e)
         return jsonify({"Error": f"Error while searching \n{e}"}), 408
