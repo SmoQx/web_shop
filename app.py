@@ -65,6 +65,7 @@ def add_user():
 @app.route('/add_item', methods = ['POST'])
 def add_item():
     # TODO: check if the integer isnt to high
+    int_size = 40000
     try:
         data = request.get_json()
         produkty_id = data.get("produkty_id")
@@ -75,6 +76,9 @@ def add_item():
         if not (produkty_id and produkt_name and value and amount and typ):
             print("Missing requierd filds in item")
             return jsonify({"error": "Missing required fields"}), 400
+        if produkty_id > int_size:
+            print("ID integer to high")
+            return jsonify({"Error": "ID value to high"}), 408
     except Exception as e:
         print(e)
         return jsonify({"error": "error reading json"}), 408
