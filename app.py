@@ -168,9 +168,13 @@ def change_item():
         return jsonify({"Error": f"Error while processing data {e}"}), 408
 
     data = request.json
-    
+    produkty = apps_db.Produkty
+
     try:
         print(what_to_change.items())
+        print(what_to_change.keys())
+        print(apps_db.Produkty.__dict__)
+        print(vars(apps_db.Produkty))
         querry_produkty = db.session.get(apps_db.Produkty, item_id)
         print(querry_produkty.produkty_id)
     except Exception as e:
