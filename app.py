@@ -173,8 +173,8 @@ def change_item():
     try:
         print(what_to_change.items())
         print(what_to_change.keys())
-        print(apps_db.Produkty.__dict__)
-        print(vars(apps_db.Produkty))
+        print(apps_db.Produkty.__dict__, "\n")
+        print(vars(apps_db.Produkty), "\n")
         querry_produkty = db.session.get(apps_db.Produkty, item_id)
         print(querry_produkty.produkty_id)
     except Exception as e:
