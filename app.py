@@ -98,7 +98,7 @@ def add_item():
     return jsonify({"success": f"added {new_item.produkt_name}"})
 
 
-@app.route('/find_item', methods = ['GET', 'POST'])
+@app.route('/find_item', methods = ['GET'])
 def find_item():
     try:
         data = request.get_json()
@@ -154,9 +154,8 @@ def authenticate():
         db.session.close()
 
 
-@app.route('/change_item', methods = ['PUT', 'POST'])
+@app.route('/change_item', methods = ['PUT'])
 def change_item():
-    # TODO: if key is equal to a column name than change it
     try:
         data = request.get_json()
         item_id = data.get("item_id")
@@ -167,21 +166,12 @@ def change_item():
         print(e)
         return jsonify({"Error": f"Error while processing data {e}"}), 408
 
-    data = request.json
-    produkty = apps_db.Produkty
-    my_lits = []
-
     try:
-        print(what_to_change.items())
-        print(what_to_change.keys())
-        print(vars(produkty), "\n")
-        for key in what_to_change.keys():
-            if vars(produkty)[key]:
-                my_lits.append(vars(produkty))
-
-        print(my_lits)
         querry_produkty = db.session.get(apps_db.Produkty, item_id)
-        print(querry_produkty.produkty_id)
+        for key, value in what_to_change.items():
+            if key in vars(querry_produkty):
+                setattr(querry_produkty, key, value)
+        db.session.commit()
     except Exception as e:
         print(e)
         return jsonify({"Error": f"Error while searching \n{e}"}), 408
