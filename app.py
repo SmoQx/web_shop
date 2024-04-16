@@ -176,8 +176,8 @@ def change_item():
         print(what_to_change.keys())
         print(vars(produkty), "\n")
         for key in what_to_change.keys():
-            if x := vars(produkty)[key]:
-                my_lits.append(x)
+            if vars(produkty)[key]:
+                my_lits.append(vars(produkty))
 
         print(my_lits)
         querry_produkty = db.session.get(apps_db.Produkty, item_id)
