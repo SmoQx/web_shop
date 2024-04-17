@@ -115,7 +115,7 @@ def find_item():
     try:
         query_for_item = db.session.query(item_table).filter_by(produkty_id = item_id).one()
         print(f"Success found item {query_for_item.produkt_name} with id {query_for_item.produkty_id}")
-        return jsonify({"success": f"retured {query_for_item.produkty_id, query_for_item.value, query_for_item.produkt_name}"}), 201
+        return jsonify({"success": {f"'produkty_id':{query_for_item.produkty_id}, 'value': {query_for_item.value}, 'produkty_name':{query_for_item.produkt_name}"}}), 201
     except Exception as e:
         print(f"Error processing querry {e}")
         return jsonify({"error": f"Error processing querry \n {e}"}), 408
@@ -180,6 +180,10 @@ def change_item():
 
     return jsonify({"success": "The data was correct"}), 201
 
+
+@app.route('/find_items_category', methods = ['GET'])
+def find_items_category():
+    return jsonify({"Success": "Found items"})
 
 
 @app.route('/json', methods = ['POST'])
