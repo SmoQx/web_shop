@@ -115,7 +115,7 @@ def find_item():
     try:
         query_for_item = db.session.query(item_table).filter_by(produkty_id = item_id).one()
         print(f"Success found item {query_for_item.produkt_name} with id {query_for_item.produkty_id}")
-        return jsonify({"success": f"\{'produkty_id': {query_for_item.produkty_id}, 'value': {query_for_item.value}, 'produkty_name':{query_for_item.produkt_name}\}"), 201
+        return jsonify({"success": f"\x7B'produkty_id': {query_for_item.produkty_id}, 'value': {query_for_item.value}, 'produkty_name':{query_for_item.produkt_name}\x7D"}), 201
     except Exception as e:
         print(f"Error processing querry {e}")
         return jsonify({"error": f"Error processing querry \n {e}"}), 408
