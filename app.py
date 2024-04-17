@@ -201,7 +201,7 @@ def find_items_category():
     finally:
         db.session.close()
 
-    return jsonify({"Success": "Found items"}), 200
+    return jsonify({"Success": f"Found items {querry_produkty}"}), 200
 
 
 @app.route('/json', methods = ['POST'])
