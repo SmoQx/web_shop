@@ -58,7 +58,7 @@ def add_user():
         db.session.close()
 
     print(f"User succesfouly added {username}")
-    return jsonify({"success": f"user added {username}"}), 201
+    return jsonify({"success": f"user added {username}"}), 200
 
 
 @app.route('/add_item', methods = ['POST'])
@@ -115,7 +115,7 @@ def find_item():
     try:
         query_for_item = db.session.query(item_table).filter_by(produkty_id = item_id).one()
         print(f"Success found item {query_for_item.produkt_name} with id {query_for_item.produkty_id}")
-        return jsonify({"success": {'produkty_id': query_for_item.produkty_id, 'value': query_for_item.value, 'produkty_name': query_for_item.produkt_name}}), 201
+        return jsonify({"success": {'produkty_id': query_for_item.produkty_id, 'value': query_for_item.value, 'produkty_name': query_for_item.produkt_name}}), 200
     except Exception as e:
         print(f"Error processing querry {e}")
         return jsonify({"error": f"Error processing querry \n {e}"}), 408
@@ -144,7 +144,7 @@ def authenticate():
         querry_user = db.session.query(user_table).filter_by(username = gen_username_hash(username)).one()
         if querry_user.username == gen_username_hash(username) and querry_user.password == gen_password_hash(password):
             print("User authenticated")
-            return jsonify({"succes": "User authenticated"}), 201
+            return jsonify({"succes": "User authenticated"}), 200
         else:
             return jsonify({"fail": "User not authentiucated"}), 203
     except Exception as e:
@@ -178,12 +178,30 @@ def change_item():
     finally:
         db.session.close()
 
-    return jsonify({"success": "The data was correct"}), 201
+    return jsonify({"success": "The data was correct"}), 200
 
 
 @app.route('/find_items_category', methods = ['GET'])
 def find_items_category():
-    return jsonify({"Success": "Found items"})
+    try:
+        data = request.get_json()
+        category = data.get("category")
+        if not (category):
+            return jsonify({"error": "Not category"}), 404
+    except Exception as e:
+        print(e)
+        return jsonify({"error": f"{e}"}), 400
+
+    try:
+        querry_produkty = db.session.get(apps_db.Produkty, category)
+        print(querry_produkty.produkty_id)
+    except Exception as e:
+        print(e)
+        return jsonify({"Error": f"Error while searching \n{e}"}), 408
+    finally:
+        db.session.close()
+
+    return jsonify({"Success": "Found items"}), 200
 
 
 @app.route('/json', methods = ['POST'])
