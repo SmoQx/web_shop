@@ -195,6 +195,8 @@ def find_items_category():
     try:
         querry_produkty = db.session.query(apps_db.Produkty).filter_by(typ = category).all()
         print(querry_produkty)
+        if not querry_produkty:
+            return jsonify({"Success": "Found nothing"}), 201
     except Exception as e:
         print(e)
         return jsonify({"Error": f"Error while searching \n{e}"}), 408
