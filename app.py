@@ -193,7 +193,7 @@ def find_items_category():
 
     try:
         querry_produkty = db.session.query(apps_db.Produkty).filter_by(typ = category).all()
-        temp = [x.__dict__ for x in querry_produkty if not (x.__dict__['_sa_instance_state'])]
+        temp = [x.__dict__ for x in querry_produkty]
         if not querry_produkty:
             return jsonify({"Success": "Found nothing"}), 201
     except Exception as e:
