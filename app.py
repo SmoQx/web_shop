@@ -20,7 +20,6 @@ db = SQLAlchemy(app=app)
 
 # TODO: create a db table which will contain users cart and somthing to keep track of a user cart
 # TODO: add field with image to a db 
-# TODO: create function to return items based on category
 
 @app.route('/adduser', methods = ['POST'])
 def add_user():
@@ -194,7 +193,16 @@ def find_items_category():
 
     try:
         querry_produkty = db.session.query(apps_db.Produkty).filter_by(typ = category).all()
-        print(querry_produkty)
+        temp = [x.__dict__ for x in querry_produkty]
+        items_to_return = []
+        for prod in temp:
+            produkt = {}
+            for key, item in prod.items():
+                if key == '_sa_instance_state':
+                    continue
+                else:
+                    produkt[key] = item
+            items_to_return.append(produkt)
         if not querry_produkty:
             return jsonify({"Success": "Found nothing"}), 201
     except Exception as e:
@@ -203,7 +211,7 @@ def find_items_category():
     finally:
         db.session.close()
 
-    return jsonify({"Success": f"Found items {querry_produkty}"}), 200
+    return jsonify({"Success": items_to_return}), 200
 
 
 @app.route('/json', methods = ['POST'])
