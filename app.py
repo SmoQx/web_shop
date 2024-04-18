@@ -194,6 +194,15 @@ def find_items_category():
     try:
         querry_produkty = db.session.query(apps_db.Produkty).filter_by(typ = category).all()
         temp = [x.__dict__ for x in querry_produkty]
+        temp2 = []
+        for prod in temp:
+            produkt = {}
+            for key, item in prod:
+                if key == '_sa_instance_state':
+                    continue
+                else:
+                    produkt[key] = item
+            temp2.append(produkt)
         if not querry_produkty:
             return jsonify({"Success": "Found nothing"}), 201
     except Exception as e:
@@ -202,7 +211,7 @@ def find_items_category():
     finally:
         db.session.close()
 
-    return jsonify({"Success": f"Found items {temp}"}), 200
+    return jsonify({"Success": f"Found items {temp2}"}), 200
 
 
 @app.route('/json', methods = ['POST'])
