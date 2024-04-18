@@ -197,7 +197,7 @@ def find_items_category():
         temp2 = []
         for prod in temp:
             produkt = {}
-            for key, item in prod:
+            for key, item in prod.items():
                 if key == '_sa_instance_state':
                     continue
                 else:
