@@ -20,7 +20,6 @@ db = SQLAlchemy(app=app)
 
 # TODO: create a db table which will contain users cart and somthing to keep track of a user cart
 # TODO: add field with image to a db 
-# TODO: create function to return items based on category
 
 @app.route('/adduser', methods = ['POST'])
 def add_user():
@@ -203,7 +202,7 @@ def find_items_category():
     finally:
         db.session.close()
 
-    return jsonify({"Success": f"Found items {querry_produkty}"}), 200
+    return jsonify({"Success": f"Found items {querry_produkty[0].__dict__}"}), 200
 
 
 @app.route('/json', methods = ['POST'])
