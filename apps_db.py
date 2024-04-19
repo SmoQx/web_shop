@@ -21,7 +21,6 @@ class Order(db.Model):
     user = db.relationship('User', primaryjoin='Order.user_id == User.user_id', backref='orders')
 
 
-
 class Produkty(db.Model):
     __tablename__ = 'produkty'
 
@@ -31,7 +30,7 @@ class Produkty(db.Model):
     amount = db.Column(db.Integer)
     description = db.Column(db.Text)
     typ = db.Column(db.String)
-
+    img = db.Column(sapgsql.BYTEA)
 
 
 class User(db.Model):
@@ -47,3 +46,16 @@ class User(db.Model):
     address = db.Column(db.String)
     postal_code = db.Column(db.Numeric)
     city = db.Column(db.String)
+
+
+class Cart(db.Model):
+    __tablename__ = 'cart'
+
+    produkt_name = db.Column(db.ForeignKey('produkty.produkt_name'), nullable=False)
+    produkty_id = db.Column(db.ForeignKey('produkty.produkty_id'), nullable=False)
+    cart_id = db.Column(db.BigInteger, nullable=False)
+    user_id = db.Column(db.ForeignKey('users.user_id'))
+    session_id = db.Column(db.BigInteger, nullable=False, primary_key=True)
+    produkt_amount = db.Column(db.BigInteger, nullable=False)
+    value = db.Column(sapgsql.MONEY, nullable=False)
+
