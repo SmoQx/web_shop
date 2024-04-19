@@ -214,6 +214,24 @@ def find_items_category():
     return jsonify({"Success": items_to_return}), 200
 
 
+@app.route('/whats_in_the_cart')
+def whats_in_cart():
+    # TODO: function which will return whats in the cart based on session id or user id
+    return jsonify({"success": "message"}), 200
+
+
+@app.route('/add_to_cart')
+def add_to_cart():
+    # TODO: function which will append items to a cart based on the session or user id
+    return jsonify({"success": "message"}), 200
+
+
+@app.route('/remove_from_cart')
+def remove_from_cart():
+    # TODO: function for removeing items from cart or based on the time elapsed clear items from all carts
+    return jsonify({"success": "message"}), 200
+
+
 @app.route('/json', methods = ['POST'])
 def data_parser():
     content = request.get_json()
@@ -226,10 +244,6 @@ def data_parser():
             }
     return jsonify(repsonse_data), 200
     
-
-def search():
-    pass
-
 
 @app.route('/')
 def main():
