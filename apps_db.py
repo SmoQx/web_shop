@@ -51,6 +51,11 @@ class User(db.Model):
 class Cart(db.Model):
     __tablename__ = 'cart'
 
-
-
+    produkt_name = db.Column('produkt_name', db.ForeignKey('produkty.produkt_name'), nullable=False),
+    produkty_id = db.Column('produkty_id', db.ForeignKey('produkty.produkty_id'), nullable=False),
+    cart_id = db.Column('cart_id', db.BigInteger, nullable=False),
+    user_id = db.Column('user_id', db.ForeignKey('users.user_id')),
+    session_id = db.Column('session_id', db.BigInteger, nullable=False),
+    produkt_amount = db.Column('produkt_amount', db.BigInteger, nullable=False),
+    value = db.Column('value', sapgsql.MONEY, nullable=False)
 
