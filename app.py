@@ -232,6 +232,16 @@ def remove_from_cart():
     return jsonify({"success": "message"}), 200
 
 
+@app.route('/show_all_items')
+def show_all_data():
+    try:
+        data = request.get_json()
+        print(data)
+    except Exception as e:
+        return jsonify({'error': e}), 400
+    return jsonify({'success': 'message'}), 200
+
+
 @app.route('/json', methods = ['POST'])
 def data_parser():
     content = request.get_json()
