@@ -240,7 +240,7 @@ def show_all_data():
         message = data.get('message')
         if 'show' in message:
             query_items = db.session.query(apps_db.Produkty).all()
-            temp = [x.__dict__ for x in query_items]
+            temp = [{key: value for key, value in x.__dict__.items() if key != '_sa_instance_state'} for x in query_items]
             print(temp)
         else:
             return jsonify({'error': 'wrong command to show data'}), 400
