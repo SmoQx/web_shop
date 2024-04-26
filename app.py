@@ -235,16 +235,20 @@ def remove_from_cart():
 @app.route('/show_all_items')
 def show_all_data():
     try:
-        data = request.get_json()
-        print(data)
-        message = data.get('message')
+        try:
+            data = request.get_json()
+            if not (message := data.get('message')):
+                return jsonify({'eroro': 'wronge key'}), 400
+        except Exception as ex:
+            return jsonify({'error': 'error while parsing'}), 400
         if 'show' in message:
             query_items = db.session.query(apps_db.Produkty).all()
+            temp = [{key: value for key, value in x.__dict__.items() if key != '_sa_instance_state'} for x in query_items]
         else:
             return jsonify({'error': 'wrong command to show data'}), 400
     except Exception as e:
         return jsonify({'error': e}), 400
-    return jsonify({'success': f'{query_items}'}), 200
+    return jsonify({'success': temp }), 200
 
 
 @app.route('/json', methods = ['POST'])
