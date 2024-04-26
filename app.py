@@ -235,9 +235,8 @@ def remove_from_cart():
 @app.route('/show_all_items')
 def show_all_data():
     try:
-        data = request.get_json()
-        print(data)
         try:
+            data = request.get_json()
             message = data.get('message')
         except Exception as ex:
             return jsonify({'error': 'error while parsing'})
