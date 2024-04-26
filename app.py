@@ -240,11 +240,13 @@ def show_all_data():
         message = data.get('message')
         if 'show' in message:
             query_items = db.session.query(apps_db.Produkty).all()
+            temp = [x.__dict__ for x in query_items]
+            print(temp)
         else:
             return jsonify({'error': 'wrong command to show data'}), 400
     except Exception as e:
         return jsonify({'error': e}), 400
-    return jsonify({'success': f'{query_items}'}), 200
+    return jsonify({'success': f'{temp}'}), 200
 
 
 @app.route('/json', methods = ['POST'])
