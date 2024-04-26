@@ -237,7 +237,10 @@ def show_all_data():
     try:
         data = request.get_json()
         print(data)
-        message = data.get('message')
+        try:
+            message = data.get('message')
+        except Exception as ex:
+            return jsonify({'error': 'error while parsing'})
         if 'show' in message:
             query_items = db.session.query(apps_db.Produkty).all()
             temp = [{key: value for key, value in x.__dict__.items() if key != '_sa_instance_state'} for x in query_items]
