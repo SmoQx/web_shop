@@ -246,7 +246,7 @@ def show_all_data():
             return jsonify({'error': 'wrong command to show data'}), 400
     except Exception as e:
         return jsonify({'error': e}), 400
-    return jsonify({'success': f'{temp}'}), 200
+    return jsonify({'success': temp }), 200
 
 
 @app.route('/json', methods = ['POST'])
