@@ -237,7 +237,7 @@ def show_all_data():
     try:
         try:
             data = request.get_json()
-            if not message := data.get('message'):
+            if not (message := data.get('message')):
                 return jsonify({'eroro': 'wronge key'})
         except Exception as ex:
             return jsonify({'error': 'error while parsing'})
