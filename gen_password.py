@@ -1,14 +1,13 @@
 import hashlib
+import argon2
 
 
 def gen_password_hash(user_password: str) -> str:
-    hasher = hashlib.sha256()
     salt = "asdf" 
-    user_password = user_password + salt
-    hasher.update(user_password.encode("utf-8"))
-    user_password = hasher.hexdigest()
+    hasher = argon2.PasswordHasher()
+    hashed = hasher.hash(user_password + salt)
 
-    return str(user_password)
+    return str(hashed)
 
 
 if __name__ == "__main__":

@@ -1,11 +1,11 @@
-from hashlib import sha256
+import argon2
 
 
 def gen_username_hash(username: str) -> str:
-    hash = sha256()
-    hash.update(username.encode("utf-8"))
+    hasher = argon2.PasswordHasher()
+    hashed = hasher.hash(username)
 
-    return str(hash.hexdigest())
+    return str(hashed)
 
 
 if __name__ == "__main__":
